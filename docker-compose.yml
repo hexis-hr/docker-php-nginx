@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  database:
+    image: mysql/mysql-server:8.0.23-1.1.19
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=hubbig
+      - MYSQL_PASSWORD=hubbig
+      - MYSQL_DATABASE=hubbig
+    volumes:
+      - db_data:/var/lib/mysql:cached
+    ports:
+      - target: 3306
+        published: 3306
+        protocol: tcp
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./code:/code
+      - ./site.conf:/etc/nginx/conf.d/site.conf
+    links:
+      - php
+  php:
+    image: php:8-fpm
+    restart: unless-stopped
+    volumes:
+      - ./code:/code
+volumes:
+  db_data:
